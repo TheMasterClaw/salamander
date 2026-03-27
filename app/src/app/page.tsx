@@ -11,6 +11,7 @@ import AgentCards from '@/components/AgentCards'
 import PortfolioOverview from '@/components/PortfolioOverview'
 import TrustLayer from '@/components/TrustLayer'
 import TradeFeed from '@/components/TradeFeed'
+import InfrastructureDashboard from '@/components/InfrastructureDashboard'
 import DeployAgent from '@/components/DeployAgent'
 
 const AgentRegistryABI = [
@@ -88,6 +89,7 @@ export default function Home() {
       <AgentCards />
       <PortfolioOverview />
       <TradeFeed />
+      <InfrastructureDashboard />
       <TrustLayer />
       <DeployAgent />
 
