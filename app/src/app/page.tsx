@@ -7,6 +7,7 @@ import { CONTRACTS } from '@/config'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import MarketTicker from '@/components/MarketTicker'
+import TradingChart from '@/components/TradingChart'
 import AgentCards from '@/components/AgentCards'
 import PortfolioOverview from '@/components/PortfolioOverview'
 import TrustLayer from '@/components/TrustLayer'
@@ -86,6 +87,14 @@ export default function Home() {
 
       <Hero />
       <MarketTicker />
+      
+      {/* TradingView Chart */}
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <TradingChart symbol="BTC" height={420} />
+        </div>
+      </section>
+
       <AgentCards />
       <PortfolioOverview />
       <TradeFeed />
