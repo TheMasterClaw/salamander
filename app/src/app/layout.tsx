@@ -1,0 +1,24 @@
+import type { Metadata } from 'next'
+import { headers } from 'next/headers'
+import Providers from '@/context'
+import './globals.css'
+
+export const metadata: Metadata = {
+  title: '🦎 Salamander — Trustless AI Trading Agents',
+  description: 'Any Chain, Any DEX, Any Strategy. Built on ERC-8004.',
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headerList = await headers()
+  const cookies = headerList.get('cookie')
+
+  return (
+    <html lang="en">
+      <body>
+        <Providers cookies={cookies}>
+          {children}
+        </Providers>
+      </body>
+    </html>
+  )
+}
