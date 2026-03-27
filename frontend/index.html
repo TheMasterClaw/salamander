@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦎 Salamander — Trustless AI Trading Agents</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0e14;
+    --surface: #131920;
+    --surface2: #1a2230;
+    --border: #1e2a3a;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #d29922;
+    --accent: #4ade80;
+    --salamander: #22c55e;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .logo-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.4));
+  }
+
+  .logo span { color: var(--salamander); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .chain-selector {
+    display: flex;
+    gap: 6px;
+  }
+
+  .chain-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .chain-btn:hover, .chain-btn.active {
+    border-color: var(--salamander);
+    color: var(--salamander);
+    background: rgba(34, 197, 94, 0.1);
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Main Grid */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+    padding: 20px 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(74, 222, 128, 0.3); }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Market Prices */
+  .prices { grid-column: 1 / -1; }
+
+  .price-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .price-item {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .price-pair {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pair-name {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pair-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .btc-icon { background: #f7931a; color: #fff; }
+  .eth-icon { background: #627eea; color: #fff; }
+  .sol-icon { background: #9945ff; color: #fff; }
+
+  .price-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .price-change {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .up { color: var(--green); background: rgba(63, 185, 80, 0.1); }
+  .down { color: var(--red); background: rgba(248, 81, 73, 0.1); }
+
+  .price-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .price-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* Agents */
+  .agents { grid-column: 1 / 3; }
+
+  .agent-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .agent-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 100px 100px 100px 80px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  .agent-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .agent-name { font-weight: 600; font-size: 14px; }
+  .agent-type { color: var(--text2); font-size: 12px; }
+
+  .agent-stat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .agent-status {
+    text-align: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .running { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+  .idle { background: rgba(139, 148, 158, 0.15); color: var(--text2); }
+
+  /* Signals */
+  .signals-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .signal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .signal-left { display: flex; align-items: center; gap: 10px; }
+
+  .signal-action {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .buy { background: rgba(63, 185, 80, 0.2); color: var(--green); }
+  .sell { background: rgba(248, 81, 73, 0.2); color: var(--red); }
+
+  .signal-confidence {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  /* ERC-8004 */
+  .erc-card { grid-column: 3; grid-row: 2 / 4; }
+
+  .registry-item {
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .registry-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .registry-desc { color: var(--text2); font-size: 12px; line-height: 1.5; }
+
+  .registry-stat {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .stat-label { color: var(--text2); }
+  .stat-value { color: var(--salamander); font-weight: 600; }
+
+  /* Trade Feed */
+  .trades { grid-column: 1 / 3; }
+
+  .trade-feed { display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; }
+
+  .trade-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 80px 80px 100px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .trade-time { color: var(--text2); }
+  .trade-pair { font-weight: 600; color: var(--text); font-family: 'Inter', sans-serif; }
+  .trade-chain { color: var(--purple); font-size: 11px; }
+
+  /* Canvas chart */
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-top: 12px;
+  }
+
+  canvas { width: 100% !important; height: 100% !important; border-radius: 8px; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text2);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .footer a { color: var(--salamander); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .main { grid-template-columns: 1fr 1fr; }
+    .prices { grid-column: 1 / -1; }
+    .agents { grid-column: 1 / -1; }
+    .erc-card { grid-column: 1 / -1; grid-row: auto; }
+    .trades { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 640px) {
+    .main { grid-template-columns: 1fr; }
+    .chain-selector { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <span class="logo-icon">🦎</span>
+    <div>Salamander <span style="color:var(--text2);font-weight:400;font-size:14px">v0.1</span></div>
+  </div>
+  <div class="header-right">
+    <div class="chain-selector">
+      <button class="chain-btn active" onclick="selectChain(this,'base')">Base</button>
+      <button class="chain-btn" onclick="selectChain(this,'ethereum')">Ethereum</button>
+      <button class="chain-btn" onclick="selectChain(this,'arbitrum')">Arbitrum</button>
+      <button class="chain-btn" onclick="selectChain(this,'polygon')">Polygon</button>
+      <button class="chain-btn" onclick="selectChain(this,'optimism')">Optimism</button>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      LIVE
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Market Prices -->
+  <div class="card prices">
+    <div class="card-title">📊 Live Market</div>
+    <div class="price-grid" id="priceGrid"></div>
+  </div>
+
+  <!-- Active Agents -->
+  <div class="card agents">
+    <div class="card-title">🤖 Active Agents</div>
+    <div class="agent-list" id="agentList"></div>
+  </div>
+
+  <!-- ERC-8004 Panel -->
+  <div class="card erc-card">
+    <div class="card-title">🔗 ERC-8004 Trust Layer</div>
+    <div class="registry-item">
+      <div class="registry-name">📝 Identity Registry</div>
+      <div class="registry-desc">NFT-based agent IDs. Portable, censorship-resistant identity for every trading agent.</div>
+      <div class="registry-stat">
+        <span class="stat-label">Agents</span>
+        <span class="stat-value" id="agentCount">4</span>
+      </div>
+    </div>
+    <div class="registry-item">
+      <div class="registry-name">⭐ Reputation Registry</div>
+      <div class="registry-desc">On-chain trade tracking, PnL recording, peer feedback and scoring.</div>
+      <div class="registry-stat">
+        <span class="stat-label">Avg Score</span>
+        <span class="stat-value" id="avgScore">87/100</span>
+      </div>
+    </div>
+    <div class="registry-item">
+      <div class="registry-name">🛡️ Validation Registry</div>
+      <div class="registry-desc">Independent validation via stake re-execution, zkML proofs, or TEE attestation.</div>
+      <div class="registry-stat">
+        <span class="stat-label">Approval Rate</span>
+        <span class="stat-value" id="approvalRate">94%</span>
+      </div>
+    </div>
+    <div class="registry-item" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);">
+      <div class="registry-name" style="color:var(--salamander);">🦎 Salamander Protocol</div>
+      <div class="registry-desc">Trust is proportional to value at risk. Low-stake tasks need minimal validation. High-stake trades get full verification.</div>
+    </div>
+  </div>
+
+  <!-- AI Signals -->
+  <div class="card">
+    <div class="card-title">⚡ AI Signals</div>
+    <div class="signals-list" id="signalsList"></div>
+    <div class="chart-container">
+      <canvas id="signalChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Trade Feed -->
+  <div class="card trades">
+    <div class="card-title">📜 Trade Feed</div>
+    <div class="trade-feed" id="tradeFeed"></div>
+  </div>
+</div>
+
+<div class="footer">
+  Built with 🦎 for the <a href="https://lablab.ai/ai-hackathons/ai-trading-agents">AI Trading Agents Hackathon</a> — lablab.ai × Surge × Kraken
+</div>
+
+<script>
+// Market data
+const PAIRS = [
+  { symbol: 'BTC', pair: 'XBTUSD', icon: 'btc-icon', color: '#f7931a' },
+  { symbol: 'ETH', pair: 'ETHUSD', icon: 'eth-icon', color: '#627eea' },
+  { symbol: 'SOL', pair: 'SOLUSD', icon: 'sol-icon', color: '#9945ff' },
+];
+
+let marketData = {};
+let selectedChain = 'base';
+
+// Agents
+const agents = [
+  { name: 'Alpha-1', type: 'Momentum', icon: '🏃', status: 'running', trades: 47, winRate: 68, pnl: 1247.50 },
+  { name: 'Shield-X', type: 'Protection', icon: '🛡️', status: 'running', trades: 23, winRate: 82, pnl: 489.20 },
+  { name: 'Yield-Farm', type: 'Yield', icon: '🌾', status: 'running', trades: 156, winRate: 71, pnl: 3102.80 },
+  { name: 'Flash-9', type: 'Flash', icon: '⚡', status: 'idle', trades: 8, winRate: 75, pnl: 892.00 },
+];
+
+// Render agents
+function renderAgents() {
+  const list = document.getElementById('agentList');
+  list.innerHTML = agents.map(a => `
+    <div class="agent-row">
+      <div class="agent-icon" style="background:var(--surface)">${a.icon}</div>
+      <div>
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-type">${a.type} · ${selectedChain}</div>
+      </div>
+      <div class="agent-stat">${a.trades} trades</div>
+      <div class="agent-stat">${a.winRate}%</div>
+      <div class="agent-stat ${a.pnl >= 0 ? 'up' : 'down'}">$${a.pnl.toLocaleString()}</div>
+      <div class="agent-status ${a.status}">${a.status.toUpperCase()}</div>
+    </div>
+  `).join('');
+}
+
+// Fetch prices from Kraken
+async function fetchPrices() {
+  const grid = document.getElementById('priceGrid');
+  
+  for (const p of PAIRS) {
+    try {
+      const res = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${p.pair}`);
+      const json = await res.json();
+      const data = Object.values(json.result)[0];
+      
+      const last = parseFloat(data.c[0]);
+      const high = parseFloat(data.h[1]);
+      const low = parseFloat(data.l[1]);
+      const open = parseFloat(data.o);
+      const change = ((last - open) / open * 100);
+      const position = (last - low) / (high - low) * 100;
+      
+      marketData[p.symbol] = { last, high, low, open, change, position };
+    } catch(e) {
+      console.error('Price fetch error:', e);
+    }
+  }
+  
+  renderPrices();
+  generateSignals();
+}
+
+function renderPrices() {
+  const grid = document.getElementById('priceGrid');
+  grid.innerHTML = PAIRS.map(p => {
+    const d = marketData[p.symbol];
+    if (!d) return '';
+    const isUp = d.change >= 0;
+    return `
+      <div class="price-item">
+        <div class="price-pair">
+          <div class="pair-name">
+            <div class="pair-icon ${p.icon}">${p.symbol[0]}</div>
+            ${p.symbol}/USD
+          </div>
+          <span class="price-change ${isUp ? 'up' : 'down'}">${isUp ? '+' : ''}${d.change.toFixed(2)}%</span>
+        </div>
+        <div class="price-value" style="color:${isUp ? 'var(--green)' : 'var(--red)'}">$${d.last.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace">
+          <span>L: $${d.low.toLocaleString()}</span>
+          <span>H: $${d.high.toLocaleString()}</span>
+        </div>
+        <div class="price-bar">
+          <div class="price-bar-fill" style="width:${d.position.toFixed(0)}%;background:${isUp ? 'var(--green)' : 'var(--red)'}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Generate AI signals
+function generateSignals() {
+  const list = document.getElementById('signalsList');
+  const signals = [];
+  
+  for (const p of PAIRS) {
+    const d = marketData[p.symbol];
+    if (!d) continue;
+    
+    const pos = d.position / 100;
+    if (pos > 0.8) {
+      signals.push({ pair: `${p.symbol}/USD`, action: 'BUY', confidence: (pos * 100).toFixed(0), reason: 'Bullish momentum' });
+    } else if (pos < 0.2) {
+      signals.push({ pair: `${p.symbol}/USD`, action: 'SELL', confidence: ((1 - pos) * 100).toFixed(0), reason: 'Bearish pressure' });
+    }
+  }
+  
+  if (signals.length === 0) {
+    signals.push({ pair: 'BTC/USD', action: 'HOLD', confidence: '50', reason: 'Neutral — waiting for breakout' });
+  }
+  
+  list.innerHTML = signals.map(s => `
+    <div class="signal-row">
+      <div class="signal-left">
+        <span class="signal-action ${s.action.toLowerCase()}">${s.action}</span>
+        <span style="font-weight:600">${s.pair}</span>
+        <span style="color:var(--text2);font-size:12px">${s.reason}</span>
+      </div>
+      <span class="signal-confidence">${s.confidence}%</span>
+    </div>
+  `).join('');
+}
+
+// Simulated trade feed
+const chains = ['Base', 'Arbitrum', 'Ethereum', 'Polygon', 'Optimism'];
+const tradePairs = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'ETH/BTC', 'SOL/ETH'];
+
+function addTrade() {
+  const feed = document.getElementById('tradeFeed');
+  const action = Math.random() > 0.45 ? 'BUY' : 'SELL';
+  const pair = tradePairs[Math.floor(Math.random() * tradePairs.length)];
+  const chain = chains[Math.floor(Math.random() * chains.length)];
+  const amount = (Math.random() * 5000 + 100).toFixed(2);
+  const pnl = (Math.random() * 200 - 80).toFixed(2);
+  const time = new Date().toLocaleTimeString();
+  const agent = agents[Math.floor(Math.random() * agents.length)];
+  
+  const row = document.createElement('div');
+  row.className = 'trade-row';
+  row.innerHTML = `
+    <span class="trade-time">${time}</span>
+    <span class="trade-pair">${agent.icon} ${agent.name} · ${pair}</span>
+    <span class="signal-action ${action.toLowerCase()}" style="text-align:center">${action}</span>
+    <span class="trade-chain">${chain}</span>
+    <span style="color:${parseFloat(pnl) >= 0 ? 'var(--green)' : 'var(--red)'};text-align:right">
+      ${parseFloat(pnl) >= 0 ? '+' : ''}$${pnl}
+    </span>
+  `;
+  
+  feed.insertBefore(row, feed.firstChild);
+  if (feed.children.length > 20) feed.removeChild(feed.lastChild);
+  
+  // Update agent stats
+  const a = agents[Math.floor(Math.random() * agents.length)];
+  a.trades++;
+  a.pnl += parseFloat(pnl);
+  renderAgents();
+}
+
+// Mini chart
+function drawChart() {
+  const canvas = document.getElementById('signalChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = 180;
+  
+  const w = canvas.width;
+  const h = canvas.height;
+  
+  // Generate random walk data
+  const points = 60;
+  const data = [];
+  let val = 50;
+  for (let i = 0; i < points; i++) {
+    val += (Math.random() - 0.48) * 3;
+    val = Math.max(10, Math.min(90, val));
+    data.push(val);
+  }
+  
+  // Draw gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, h);
+  gradient.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+  gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+  
+  ctx.beginPath();
+  ctx.moveTo(0, h);
+  data.forEach((v, i) => {
+    ctx.lineTo((i / (points - 1)) * w, h - (v / 100) * h);
+  });
+  ctx.lineTo(w, h);
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  
+  // Draw line
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = (i / (points - 1)) * w;
+    const y = h - (v / 100) * h;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = 'var(--salamander)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Draw latest dot
+  const lastX = w;
+  const lastY = h - (data[data.length - 1] / 100) * h;
+  ctx.beginPath();
+  ctx.arc(lastX - 2, lastY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = 'var(--salamander)';
+  ctx.fill();
+}
+
+function selectChain(btn, chain) {
+  document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedChain = chain;
+  renderAgents();
+}
+
+// Init
+fetchPrices();
+renderAgents();
+drawChart();
+
+// Live updates
+setInterval(fetchPrices, 10000);
+setInterval(addTrade, 3000);
+setInterval(drawChart, 5000);
+
+// Initial trades
+for (let i = 0; i < 5; i++) setTimeout(addTrade, i * 500);
+</script>
+</body>
+</html>
