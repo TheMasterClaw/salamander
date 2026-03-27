@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title AgentRegistry (ERC-8004 Identity Registry)
@@ -10,8 +9,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
  *         Each agent mints an NFT = their portable, censorship-resistant ID.
  */
 contract AgentRegistry is ERC721URIStorage {
-    using Counters for Counters.Counter;
-    Counters.Counter private _agentIds;
+    uint256 private _agentIds;
 
     struct AgentInfo {
         address owner;
@@ -37,8 +35,8 @@ contract AgentRegistry is ERC721URIStorage {
         string calldata endpoint,
         string calldata metadataURI
     ) external returns (uint256) {
-        _agentIds.increment();
-        uint256 newAgentId = _agentIds.current();
+        _agentIds++;
+        uint256 newAgentId = _agentIds;
 
         _mint(msg.sender, newAgentId);
         _setTokenURI(newAgentId, metadataURI);
@@ -79,6 +77,6 @@ contract AgentRegistry is ERC721URIStorage {
     }
 
     function totalAgents() external view returns (uint256) {
-        return _agentIds.current();
+        return _agentIds;
     }
 }
