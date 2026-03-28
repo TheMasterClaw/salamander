@@ -3,7 +3,7 @@
 import { wagmiAdapter, projectId, networks } from '@/config'
 import { createAppKit } from '@reown/appkit/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React, { type ReactNode } from 'react'
+import React, { type ReactNode, useEffect, useState } from 'react'
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi'
 
 const queryClient = new QueryClient()
@@ -30,8 +30,15 @@ createAppKit({
   },
 })
 
-export default function Providers({ children, cookies }: { children: ReactNode; cookies: string | null }) {
-  const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig as Config, cookies)
+export default function Providers({ children }: { children: ReactNode }) {
+  const [initialState, setInitialState] = useState<ReturnType<typeof cookieToInitialState> | undefined>(undefined)
+
+  useEffect(() => {
+    // Get cookies client-side for static export
+    const cookies = document.cookie
+    const state = cookieToInitialState(wagmiAdapter.wagmiConfig as Config, cookies)
+    setInitialState(state)
+  }, [])
 
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config} initialState={initialState}>
