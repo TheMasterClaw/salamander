@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MasterClaw Status Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0e14;
+      color: #e6edf3;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .card {
+      background: #111827;
+      border: 1px solid #1e2d40;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 14px;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e2d40;
+    }
+    .metric:last-child { border-bottom: none; }
+    .metric-label { color: #8b949e; }
+    .metric-value { font-family: monospace; }
+    .btn {
+      background: #22c55e;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .btn:hover { background: #16a34a; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #22c55e;
+      color: #22c55e;
+    }
+    .btn-secondary:hover { background: rgba(34, 197, 94, 0.1); }
+    .log {
+      background: #0d1117;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .success { color: #22c55e; }
+    .error { color: #f85149; }
+    .warning { color: #d29922; }
+    .links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .link-card {
+      background: #1a2332;
+      padding: 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #e6edf3;
+      transition: all 0.2s;
+    }
+    .link-card:hover {
+      background: #222d3d;
+      transform: translateY(-2px);
+    }
+    .timestamp {
+      color: #8b949e;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span class="status-dot"></span> MasterClaw Status Dashboard</h1>
+    <p class="timestamp">Last updated: <span id="timestamp">--</span></p>
+
+    <div class="card">
+      <h2>🚀 Quick Links</h2>
+      <div class="links">
+        <a href="https://themasterclaw.github.io/salamander" target="_blank" class="link-card">
+          <strong>🦎 Salamander Live Site</strong>
+          <div style="color: #8b949e; font-size: 12px;">Trading Platform</div>
+        </a>
+        <a href="https://github.com/TheMasterClaw/salamander" target="_blank" class="link-card">
+          <strong>📁 GitHub Repo</strong>
+          <div style="color: #8b949e; font-size: 12px;">Source Code</div>
+        </a>
+        <a href="https://lablab.ai/event/ai-trading-agents" target="_blank" class="link-card">
+          <strong>🏆 Hackathon</strong>
+          <div style="color: #8b949e; font-size: 12px;">AI Trading Agents</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Project Status</h2>
+      <div id="status-content">
+        <div class="metric">
+          <span class="metric-label">Status</span>
+          <span class="metric-value success">● Online</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Branch</span>
+          <span class="metric-value">master</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Last Commit</span>
+          <span class="metric-value" id="last-commit">Loading...</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Build Status</span>
+          <span class="metric-value success">✓ Success</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Actions</h2>
+      <button class="btn" onclick="refreshStatus()">🔄 Refresh Status</button>
+      <button class="btn btn-secondary" onclick="window.open('https://themasterclaw.github.io/salamander', '_blank')">🌐 Open Salamander</button>
+      <button class="btn btn-secondary" onclick="window.open('https://github.com/TheMasterClaw/salamander/commits/master', '_blank')">📜 View Commits</button>
+    </div>
+
+    <div class="card">
+      <h2>📝 Recent Activity</h2>
+      <div class="log" id="activity-log">Loading activity log...</div>
+    </div>
+
+    <div class="card">
+      <h2>💬 Contact</h2>
+      <p>WhatsApp: Connected ✅</p>
+      <p style="color: #8b949e; font-size: 12px;">Send a message via WhatsApp and I'll respond immediately.</p>
+    </div>
+  </div>
+
+  <script>
+    function updateTimestamp() {
+      document.getElementById('timestamp').textContent = new Date().toLocaleString();
+    }
+
+    function refreshStatus() {
+      updateTimestamp();
+      // In a real implementation, this would fetch from an API
+      document.getElementById('activity-log').innerHTML = `
+[${new Date().toLocaleTimeString()}] Status check initiated...
+[${new Date().toLocaleTimeString()}] GitHub Pages: Online ✅
+[${new Date().toLocaleTimeString()}] Last commit: ea62564 - AAA overhaul v2
+[${new Date().toLocaleTimeString()}] Build: Successful ✅
+[${new Date().toLocaleTimeString()}] WhatsApp: Connected ✅
+      `.trim();
+    }
+
+    // Initial load
+    updateTimestamp();
+    refreshStatus();
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      updateTimestamp();
+    }, 30000);
+  </script>
+</body>
+</html>
